@@ -1,0 +1,8 @@
+#Not needed
+mssql-data/
+
+WpfApp/bin/
+WpfApp/obj/
+
+ASPWebApi/bin/
+ASPWebApi/obj/

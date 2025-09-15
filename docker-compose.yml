@@ -1,0 +1,85 @@
+# docker compose -f 'docker-compose.yml' up --build 'webapi' [Only running webapi service] (can use -d for deteched)
+version: '3.9'
+
+networks:
+  loki:
+  database:
+
+services:
+
+  # Handles the API calls for Login and Registration of users
+  webapi:
+    build:
+      context: ./ASPWebAPI      # Build context points to the project folder
+      dockerfile: Dockerfile    # Optional if named Dockerfile
+    ports:
+      - "5000:5000"
+    environment:                #TEMPORARY FOR TESTING TO BE ABLE TO USE SWAGGER
+    - ASPNETCORE_ENVIRONMENT=Development
+    networks:                  
+      - loki                    
+      - database                
+
+
+  # SQL Server container for database - Doesnt work on ARM (Legion GO sadly) 
+  # If you wish to use this service, will need to configure appsetting.json in the WEB API to use this.
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Password@123
+    ports:
+      - "1433:1433"
+    volumes:
+      - ./mssql-data:/var/opt/mssql
+    networks:
+      - database
+
+  # Loki+ Grafana + Promtail Stack for managing log data below
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - loki
+  
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - /var/log:/var/log
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - loki
+
+  grafana:
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_FEATURE_TOGGLES_ENABLE=alertingSimplifiedRouting,alertingQueryAndExpressionsStepMode
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        mkdir -p /etc/grafana/provisioning/datasources
+        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
+        apiVersion: 1
+        datasources:
+        - name: Loki
+          type: loki
+          access: proxy 
+          orgId: 1
+          url: http://loki:3100
+          basicAuth: false
+          isDefault: true
+          version: 1
+          editable: false
+        EOF
+        /run.sh
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - loki

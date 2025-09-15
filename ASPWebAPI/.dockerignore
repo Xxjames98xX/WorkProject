@@ -1,0 +1,18 @@
+# Ignores copying the compiled binaries /bin which occurs after building the project
+/bin
+
+# Ignores copying the temporary files which occurs when building the project
+/obj
+
+# Other common ignores, but some arent relevant to the current project
+.vs/
+.vscode/
+**/publish/
+.env
+
+# Ignore Database files
+/Migrations
+
+# Ignore docker related files
+Dockerfile
+.dockerignore
