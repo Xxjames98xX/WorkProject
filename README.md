@@ -14,7 +14,7 @@ To run the backend using Docker, execute the following from the **root folder**:
 ```bash
 docker compose up --build -d
 ```
-*If running MS-SQL locally (host) instead of containerized, to change the connection strings. 
+*Currently using a container image of MS-SQL pulled from docker repo. The entire backend has been dockerized. However if trying to run MS-SQL locally (host) to change the connection strings.  
 For more info refer to the DockerFile within the ASPWebAPI*
 
 ## 🖥️ Frontend
