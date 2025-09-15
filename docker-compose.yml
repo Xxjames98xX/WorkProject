@@ -31,8 +31,8 @@ services:
       - SA_PASSWORD=Password@123
     ports:
       - "1433:1433"
-    volumes:
-      - ./mssql-data:/var/opt/mssql
+    # volumes: # This causes some issues with the permissions, not able to use this yet untill properly configured
+    #   - ./mssql-data:/var/opt/mssql
     networks:
       - database
 

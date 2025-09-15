@@ -62,4 +62,10 @@ if (app.Environment.IsProduction())
 }
 
 app.MapControllers(); // Maps attribute-routed API controllers, enabling them to handle requests
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AccountsDBContext>();
+    db.Database.Migrate();
+}
+
 app.Run();

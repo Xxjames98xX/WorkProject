@@ -10,9 +10,6 @@
 **/publish/
 .env
 
-# Ignore Database files
-/Migrations
-
 # Ignore docker related files
 Dockerfile
 .dockerignore

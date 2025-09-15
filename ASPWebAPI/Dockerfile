@@ -4,7 +4,7 @@
 
 # NOTE: if using containerized MSSQL server then use below connection string. Within appsettings.json
 # Using System Admin (Sa) user for simplicity. In production use a different user with limited permissions.
-# "DefaultConnection": Server=sqlserver;Database=MyWebAppDb;User Id=sa;Password=Password@123;TrustServerCertificate=True;
+# "DefaultConnection":  "Server=sqlserver;Database=master;User Id=sa;Password=Password@123;TrustServerCertificate=True;"
 # -------------------------------------------------------------------------------
 
 # This Dockerfile is used to build and run the ASP.NET Web API application.
@@ -34,5 +34,8 @@ WORKDIR /app
 COPY --from=build /app/publish . 
 ENTRYPOINT ["dotnet", "ASPWebAPI.dll"]
 
+# Note: If no migrations folder is created yet, then create one using the command below
+# dotnet ef migrations add InitialCreate
+# This is required for database update to work
 # Apply Migrations on startup also
 CMD ["sh", "-c", "dotnet ef database update && dotnet YourWebApi.dll"]
